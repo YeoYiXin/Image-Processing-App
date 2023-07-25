@@ -3,7 +3,7 @@
  Painterly rendering using Python
  
  Style includes:
- 1. Cartoon
+ 1. Cartoon<br />
     The filter is implemented according to these steps:<br />
     a. Noise removal through Gaussian Blur<br />
     b. Determine threshold for edge detection<br />
@@ -13,16 +13,26 @@
     f. Converting the image to cartoon<br />
     
     Original Image:<br />
-    ![flower](https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/9c24d033-754d-4682-b498-cc5a0db09090)
-
-    <br />
+    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/9c24d033-754d-4682-b498-cc5a0db09090" width="600" height="338">
+ 
     Filtered Image: <br />
-    ![cartoon](https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/3f98a970-fe2d-4625-ba54-939778a65593)
-
-    <br />
+    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/0d7da203-4c49-4f24-9f24-bc97ea70a00a" width="600" height="338">
     
- 3. Watercolour
- 4. Impressionism
+ 2. Watercolour<br />
+    The filter is implemented according to these steps:<br />
+    a. Noise removal through Gaussian Blur<br />
+    b. Histogram equalisation for contrast improvement<br />
+    c. Creating outline (sketch lines) of the image<br />
+    d. Maniplating the saturation and brightness<br />
+    e. Noise removal of the coloured image<br />
+    f. Applying the sketch and coloured image<br />
+
+    Filtered Image: <br />
+    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/f2f419ee-817c-49a6-8e30-529416a4c747" width="600" height="338">
+
+    
+ 3. Impressionism
+    
  The website may have these functionalities:
  1. User shall upload the image and choose the style that they want. (Restriction: only allow image of certain extension - TBA)
  2. User can download the image. (Restriction: only allow image of certain extension - TBA)
