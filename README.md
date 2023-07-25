@@ -28,7 +28,7 @@
     f. Applying the sketch and coloured image<br />
 
     Filtered Image: <br />
-    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/f2f419ee-817c-49a6-8e30-529416a4c747" width="600" height="338">
+    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/c2f96f56-2f5d-4519-a49b-88d49081f189" width="600" height="338">
 
     
  3. Impressionism
