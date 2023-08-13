@@ -33,8 +33,8 @@
     f. Applying the sketch and coloured image<br />
 
     Filtered Image: <br />
-    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/24cd0f4c-23d8-463b-99df-e8cf9df9ed50" width="600" height="338"> <br />
-    
+    <img src="https://github.com/YeoYiXin/Image-Processing-App/assets/89788614/1482d1b1-0b83-4211-ab52-ba96973d6455" width="600" height="338"> <br />
+
     
  The website may have these functionalities:
  1. User shall upload the image and choose the style that they want. (Restriction: only allow image of certain extension - TBA)
