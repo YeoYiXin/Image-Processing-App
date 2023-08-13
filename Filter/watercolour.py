@@ -18,14 +18,11 @@ def erosion():
     # you want to erode a given image.
     img_erosion = cv2.erode(image_black, kernel, iterations=1) 
     # cv2.imshow('Input', img)
-    path = Path("Dil.jpg")
     cv2.imwrite("Dil.jpg", img_erosion)
-    return path
 # cv2.waitKey(0)
 
 def transparent():
-    path = erosion()
-    img = Image.open(path)
+    img = Image.open("Dil.jpg")
     img = img.convert("L")
     img = img.convert("RGBA")
 
@@ -133,7 +130,7 @@ def filter3(img, grey, brush_size): #send brush_size from main
     cv2.imwrite(str(name), bilateral_im)
 
     waterc = Image.open("smoothen.png") #("final_with_border.png")
-    paper = Image.open("apaper.jpg").convert(waterc.mode)
+    paper = Image.open("Filter/apaper.jpg").convert(waterc.mode)
     paper = paper.resize(waterc.size)
     img = Image.blend(waterc,paper,0.3)
     img.show()

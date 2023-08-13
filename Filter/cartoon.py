@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2 as openCV
 
-def filter(img, grey, brush_size):
+def filter1(img, grey, brush_size):
     
     #Blur image
     img_filter = grey.filter((ImageFilter.GaussianBlur(radius = brush_size))) #blur it according to the brush_size
@@ -52,7 +52,9 @@ def filter(img, grey, brush_size):
         
     #Convert to a cartoon version
     cartoon = openCV.bitwise_and(res2, res2, mask= invert)
-    openCV.imshow("CARTOON", cartoon)
     openCV.imwrite("Cartoon.JPG", cartoon)
+
+    cartoon1 = Image.open("Cartoon.JPG")
+    cartoon1.show()
  
 # filter()
