@@ -14,7 +14,7 @@ if query1 == 1:
     filename = Path(query2)
 elif query1 == 2:
     query2 = str(input("Please enter file path to image (Eg, https://www.snowmonkeyresorts.com/wp-content/uploads/2019/07/58f2c6d1b886f3eae6707d9404232cd9_m.jpg): "))
-    # filename = "https://www.snowmonkeyresorts.com/wp-content/uploads/2019/07/58f2c6d1b886f3eae6707d9404232cd9_m.jpg"
+    # query2 = "https://www.snowmonkeyresorts.com/wp-content/uploads/2019/07/58f2c6d1b886f3eae6707d9404232cd9_m.jpg"
     filename = "image.jpg"
     urllib.request.urlretrieve(query2, filename)
 else:
