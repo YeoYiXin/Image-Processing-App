@@ -100,7 +100,7 @@ class color_palette:
   
         reshape((1, len(self.colors), 3))'s parameters indicate:
         1 : the size of the first dimension
-        len(self.colors): the number of elements inside the first dimension(for example, how many rows?)
+        len(self.colors): the number of elements inside the first dimension(for example, how many rows?) If its one dimension, then it should be only 1 row.
         3: indicates how many items/values are inside the elements of the first dimension
         
         For example: [[ [191.51085044 194.63695015 197.01348974] [ 15.60520186  44.74378882  41.73369565] ]] means reshape(1, 2, 3)
