@@ -151,7 +151,8 @@ class color_palette:
         '''
         The middle of a cluster. A centroid is a vector that contains one number for each variable, 
         where each number is the mean of a variable for the observations in that cluster. 
-        The centroid can be thought of as the multi-dimensional average of the cluster.
+        The centroid can be thought of as the multi-dimensional average of the cluster. It is not a multi-dimensional average, but merely an average/mean of the given cluster - which will change
+        as the K-Means process continues until its stabilises (meaning: that is the best version that we can get and no more movement can be made, therefore, no longer affecting the centroid values).
        
         Use the cluster centroid as a general measure of cluster location and to help interpret each cluster. 
         Each centroid can be seen as representing the "average observation" within a cluster across 
