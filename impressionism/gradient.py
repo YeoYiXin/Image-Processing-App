@@ -18,8 +18,8 @@ class gradient:
         self.fieldy = fieldy
 
     def from_gradient(gray):
-        fieldx = cv2.Scharr(gray, cv2.CV_32F, 1, 0) / 10
-        fieldy = cv2.Scharr(gray, cv2.CV_32F, 0, 1) / 10
+        fieldx = cv2.Sobel(gray, cv2.CV_32F, 1, 0) / 15
+        fieldy = cv2.Sobel(gray, cv2.CV_32F, 0, 1) / 15
         return gradient(fieldx, fieldy)
         
     def direction(self, i, j):

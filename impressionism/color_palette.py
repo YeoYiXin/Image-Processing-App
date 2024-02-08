@@ -1,6 +1,5 @@
 from PIL import Image, ImageFilter
 from pathlib import Path
-# import noise_removal as nr
 import cv2
 import numpy as np
 import random, math
@@ -16,7 +15,7 @@ class color_palette:
         self.base_len = base_len if base_len > 0 else len(colors)
         self.colors =colors
         
-    def clipped_addition(img_channel, channel, _max=255, _min=0):
+    def clipped_addition(img_channel, channel):
         '''
         This function is to take in an image channel which looks something like
         [[ 90  19  53 215  60 170  89 114 237  37 104  95  58 205  73  59  15 225 25 220]], and a mask which looks like
@@ -32,25 +31,26 @@ class color_palette:
         which passes the specified threshold.
         '''
         #img_channel is passed as hue or saturation of the original image
-        #channel is passed as the default value for saturation and hue(0), or the value specified by the user
-        
-                    
+        #channel is passed as the default value for saturation and hue(0), or the value specified by the user 
+
         #np.putmask Syntax : numpy.putmask(array, condition, value)
         #np.putmask Return : Return the array having new elements according to value.
         #if the image channel value is more than the threshold(max-channel), we apply a mask with the maximum value
         
+        _max=255
+        _min=0
+        
         if channel > 0:
-            
             mask = img_channel > (_max - channel)
             img_channel += channel
             np.putmask(img_channel, mask, _max)
-            
+
         #if any values in the array match the condition of mask, then we assign those values as _min's value
         if channel < 0:
             mask = img_channel < (_min - channel)
             img_channel += channel
             np.putmask(img_channel, mask, _min)
-    
+        
     def color_select(probabilities, palette):
         '''
         r will be any real number between and including 0 and 1.
@@ -77,7 +77,6 @@ class color_palette:
         '''
         
         #BGR2HSV_FULL is used since _FULL has a larger H range than the ones without it
-        
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL)
         
         #if any hue is negative(grey image), we adjust it so its within a valid range between 0 - 255?
@@ -86,9 +85,10 @@ class color_palette:
             
         #We double the value of the hue 
         hsv[:, :, 0] += hue
-        
+
         #We pass in the actual saturation and luminosity from the HSV channels, and compare it to the default saturation and hue(which
         # is set to zero), or otherwise if specified by the user when calling regulate.
+
         color_palette.clipped_addition(hsv[:, :, 1], saturation_default) #access Saturation channel
         color_palette.clipped_addition(hsv[:, :, 2], luminosity_default) #access Value channel
         
@@ -100,7 +100,7 @@ class color_palette:
   
         reshape((1, len(self.colors), 3))'s parameters indicate:
         1 : the size of the first dimension
-        len(self.colors): the number of elements inside the first dimension(for example, how many rows?) If its one dimension, then it should be only 1 row.
+        len(self.colors): the number of elements inside the first dimension(for example, how many rows?)
         3: indicates how many items/values are inside the elements of the first dimension
         
         For example: [[ [191.51085044 194.63695015 197.01348974] [ 15.60520186  44.74378882  41.73369565] ]] means reshape(1, 2, 3)
@@ -121,7 +121,7 @@ class color_palette:
         extension = [color_palette.regulate(self.colors.reshape(1, len(self.colors), 3).astype(np.uint8), *x).reshape((-1, 3)) for x
                      in
                      extensions]
-
+        
         #np.vstack is used to stack arrays vertically to make a single array
         return color_palette(np.vstack([self.colors.reshape((-1, 3))] + extension), self.base_len)
     
@@ -198,47 +198,51 @@ class color_palette:
                     cv2.rectangle(res, (x * 80, y * 80), (x * 80 + 80, y * 80 + 80), color, -1)
                     
         return res
+
+
+    def compute_color_probabilities_base(pixels, palette, k): 
+        
+        # base layer
+        distances = scipy.spatial.distance.cdist(pixels, palette.colors) #calculate euclidean distance
     
-    
-    def compute_color_probabilities(pixels, palette, k):
+        maxima = np.amax(distances, axis=1) #finds the maxima along the horizontal (indicated by the axis = 1 command)
+      
+        distances = (maxima[:, None] - distances) #maxima might be used for scaling purposes? 
+        summ = np.sum( distances , 1) # computes the sum distances along the horizontal
+        distances /= summ[:, None] # scaling the new distance value with sum - presumably to ensure its between 0 -1        
+        base_layer = np.cumsum(distances, axis=1, dtype=np.float32)  
+
+        return base_layer
         '''
-            color decided by k means and augmented to be more vibrant in this function, the majority of calculations in this function
-            seems to be largely based on what the user wants their output to look like. The original coder decided to use distance, maxima
-            and sum as the main ways to calculate distances between pixels to determine the likelihood of a pixel being represented by a color.
+        returns the cumulative sum of each pixel on the palette and their probability distribution. 
+        This is done to give an idea of the likelihood or cumulative probabiliy than a pixel will be represented by a color on the palette. This is basically
+        done to provide a "relative" likelihood for a pixel to be represented by a color, after all the calculations we did previously, this gives us the final 
+        idea of which color a pixel will be chosen to have.
+        
+        maxima = np.amax(distances, axis=1) #finds the maxima along the horizontal (indicated by the axis = 1 command)
+      
+        distances = maxima[:, None] - distances #maxima might be used for scaling purposes? 
+        summ = np.sum(distances, 1) # computes the sum distances along the horizontal
+        distances /= summ[:, None] # scaling the new distance value with sum - presumably to ensure its between 0 -1
+
+        distances = np.exp(k*len(palette)*distances) #computing the exponential within an array and stretching it across a given k for each distances (within the array)
+        summ = np.sum(distances, 1) #computes the sum distances along the horizontal
+        distances /= summ[:, None] #scaling the new distance value with sum - presumably to ensure its between 0-1    
+        return np.cumsum(distances, axis=1, dtype=np.float32)    
         '''
+    def compute_color_probabilities_top(pixels, palette, k): 
         
+        # top layer
+        distances = scipy.spatial.distance.cdist(pixels, palette.colors) #calculate euclidean distance
+        maxima = np.amax(distances, axis=1) #finds the maxima along the horizontal (indicated by the axis = 1 command)
+      
+        distances = np.exp(maxima[:, None] - distances) #maxima might be used for scaling purposes? 
+        summ = np.sum( distances , 1) # computes the sum distances along the horizontal
+        distances /= summ[:, None] # scaling the new distance value with sum - presumably to ensure its between 0 -1
+        top_layer = np.cumsum(distances, axis=1, dtype=np.float32)  
         
-        k = 9
-
-        #1) compute the similarity/disimilarity between pixels. We do this to calculate how close each pixel is to the colors already on the palette
-        #2) compute the maximum distance between each pixel
-        #3) Normalise distance by subtracting max distances then dividing by their sum . This is to basically standardise the range of distances for each pixel
-        #   Then we scale these distancess by dividing them with the sum of distances so they should all collectively add up to one. This looks like some kind of probability
-        #   distribution of colors on the palette. Most likely, this is all done to set a range of colors and ensure all pixels can be matched with a color on the palette.
-        #4) Apply exponential. This is to further emphasize the differences between the colors by pushing the distances further. They must still add up to a distribution of 1,
-        #   but this step essentially helps to make the colors on the final image look more diverse and stand out. This means that colors that are different will be more distinguishable
-        #   and similar colors will be more concentrated together. Basically, it works to emphasize differences and similarities, so shapes and colors work together
-        #   to create distinguishable shapes and figures.
-        
-        distances = scipy.spatial.distance.cdist(pixels, palette.colors)
-        maxima = np.amax(distances, axis=1)
-
-        distances = maxima[:, None] - distances
-        summ = np.sum(distances, 1)
-        distances /= summ[:, None]
-
-        distances = np.exp(k*len(palette)*distances)
-        summ = np.sum(distances, 1)
-        distances /= summ[:, None]
-
-        #returns the cumulative sum of each pixel on the palette and their probability distribution. 
-        #This is done to give an idea of the likelihood or cumulative probabiliy than a pixel will be represented by a color on the palette. This is basically
-        # done to provide a "relative" likelihood for a pixel to be represented by a color, after all the calculations we did previously, this gives us the final 
-        # idea of which color a pixel will be chosen to have.
-        return np.cumsum(distances, axis=1, dtype=np.float32)  
+        return top_layer
     
- 
-        
     def __len__(self):
         return len(self.colors)
 
